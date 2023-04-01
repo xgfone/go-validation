@@ -1,6 +1,6 @@
 # Go Validation [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://raw.githubusercontent.com/xgfone/emailmanager/master/LICENSE)
 
-Provide a validation framework based on the built rule, supporting `Go1.11+`.
+Provide a validation framework based on the built rule, supporting `Go1.13+`.
 
 
 ## Install
