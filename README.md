@@ -78,12 +78,12 @@ func main() {
 	validation.Validate(maps, `mapv(oneof("a", "b"))`) // => <nil>
 	validation.Validate(maps, `mapv(oneof("a", "c"))`) // => an error
 
-    // For the validation rule, it support the multi-level AND/OR. For example,
-    // - "min(100) && max(200)"
-    //    => Only a value, such as integer or length of string/slice, in [100, 200] is valid.
-    // - "min(200) || max(100)"
-    //    => Only a value, such as integer or length of string/slice, in (-∞, 100] or [200, +∞) is valid.
-    // - "(min(200) || max(100)) && required)"
-    //    => Same as "min(200) || max(100)", but also cannot be ZERO.
+// For the validation rule, it support the multi-level AND/OR. For example,
+// - "min(100) && max(200)"
+//    => A value, such as integer or length of string/slice, in [100, 200] is valid.
+// - "min(200) || max(100)"
+//    => A value, such as integer or length of string/slice, in (-∞, 100] or [200, +∞) is valid.
+// - "(min(200) || max(100)) && required)"
+//    => Same as "min(200) || max(100)", but also cannot be ZERO.
 }
 ```
