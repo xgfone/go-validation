@@ -56,6 +56,10 @@ func TestRuleRanger(t *testing.T) {
 	} else if err.Error() != expectErrMsg {
 		t.Errorf("expect the error '%s', but got '%s'", expectErrMsg, err.Error())
 	}
+
+	if err := Validate(0, "ranger(-1,1)"); err != nil {
+		t.Errorf("unexpect the error: %s", err.Error())
+	}
 }
 
 func TestRuleTimeDuration(t *testing.T) {
