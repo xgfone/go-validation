@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/url"
 
 	"github.com/xgfone/go-validation/internal"
 	"github.com/xgfone/go-validation/validator"
@@ -32,6 +33,8 @@ var (
 
 	errInvalidCidr       = errors.New("invalid cidr")
 	errInvalidStringCidr = errors.New("the string is not a valid cidr")
+
+	errInvalidStringUrl = errors.New("the string is not a valid url")
 )
 
 // Mac returns a new Validator to chech whether a string is a valid 48-bit MAC.
@@ -164,4 +167,26 @@ func normalizeMac(mac string) string {
 		return ha.String()
 	}
 	return ""
+}
+
+func Url() validator.Validator {
+	return validator.NewValidator("url", func(i interface{}) error {
+		switch v := internal.Indirect(i).(type) {
+		case string:
+			return validateUrl(v)
+
+		case fmt.Stringer:
+			return validateUrl(v.String())
+
+		default:
+			return fmt.Errorf("unsupported type %T", i)
+		}
+	})
+}
+
+func validateUrl(s string) error {
+	if u, err := url.Parse(s); err != nil || u.Scheme == "" || u.Host == "" {
+		return errInvalidStringUrl
+	}
+	return nil
 }

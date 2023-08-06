@@ -37,6 +37,7 @@ func init() { RegisterDefaultsForBuilder(DefaultBuilder) }
 //
 //	ip() or ip
 //	mac() or mac
+//	url() or url
 //	addr() or addr
 //	cidr() or cidr
 //	zero() or zero
@@ -73,6 +74,7 @@ func RegisterDefaultsForBuilder(b *Builder) {
 
 	b.RegisterFunction(NewFunctionWithoutArgs("ip", validators.IP))
 	b.RegisterFunction(NewFunctionWithoutArgs("mac", validators.Mac))
+	b.RegisterFunction(NewFunctionWithoutArgs("url", validators.Url))
 	b.RegisterFunction(NewFunctionWithoutArgs("cidr", validators.Cidr))
 	b.RegisterFunction(NewFunctionWithoutArgs("addr", validators.Addr))
 

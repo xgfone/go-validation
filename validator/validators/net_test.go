@@ -52,3 +52,11 @@ func TestIP(t *testing.T) {
 	unexpectResultNil(t, "ip3", ip.Validate("1.2.3.4:80"))
 	unexpectResultNil(t, "ip4", ip.Validate("1.2.3.4/24"))
 }
+
+func TestUrl(t *testing.T) {
+	url := Url()
+	expectResultNil(t, "url1", url.Validate("http://localhost"))
+	unexpectResultNil(t, "url2", url.Validate("http://"))
+	unexpectResultNil(t, "url3", url.Validate("://localhost"))
+	unexpectResultNil(t, "url4", url.Validate("localhost"))
+}
