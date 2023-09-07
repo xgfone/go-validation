@@ -22,18 +22,6 @@ import (
 	"github.com/xgfone/go-validation/validator"
 )
 
-type testT2 struct {
-	F1 string `validate:"required"`
-	F2 int    `validate:"zero || min==5"`
-}
-
-func (t testT2) Validate(interface{}) error {
-	if t.F2 > 0 && t.F2 != len(t.F1) {
-		return fmt.Errorf("F2 is not equal to the length of F1")
-	}
-	return nil
-}
-
 func TestRuleRanger(t *testing.T) {
 	expectErrMsg := "the integer is not in range [1, 10]"
 
