@@ -31,7 +31,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/url"
 	"regexp"
@@ -730,7 +730,7 @@ func IsIMSI(str string) bool {
 
 // IsRsaPublicKey checks if a string is valid public key with provided length.
 func IsRsaPublicKey(str string, keylen int) bool {
-	pemBytes, err := ioutil.ReadAll(bytes.NewBufferString(str))
+	pemBytes, err := io.ReadAll(bytes.NewBufferString(str))
 	if err != nil {
 		return false
 	}
@@ -847,8 +847,8 @@ const ulidEncodedSize = 26
 // IsULID checks if the string is a ULID.
 //
 // Implementation got from:
-//   https://github.com/oklog/ulid (Apache-2.0 License)
 //
+//	https://github.com/oklog/ulid (Apache-2.0 License)
 func IsULID(str string) bool {
 	// Check if a base32 encoded ULID is the right length.
 	if len(str) != ulidEncodedSize {
