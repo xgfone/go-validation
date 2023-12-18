@@ -1,6 +1,6 @@
 # Go Validation [![Build Status](https://github.com/xgfone/go-validation/actions/workflows/go.yml/badge.svg)](https://github.com/xgfone/go-validation/actions/workflows/go.yml) [![GoDoc](https://pkg.go.dev/badge/github.com/xgfone/go-validation)](https://pkg.go.dev/github.com/xgfone/go-validation) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://raw.githubusercontent.com/xgfone/go-validation/master/LICENSE)
 
-Provide a validation framework based on the built rule, supporting `Go1.13+`.
+Provide a validation framework based on the built rule, supporting `Go1.16+`.
 
 
 ## Install
