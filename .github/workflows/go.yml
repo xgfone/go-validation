@@ -2,7 +2,7 @@ name: Go
 on: push
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     name: Go ${{ matrix.go }}
     strategy:
       matrix:
@@ -15,6 +15,7 @@ jobs:
         - '1.18'
         - '1.19'
         - '1.20'
+        - '1.21'
     steps:
     - uses: actions/checkout@v3
     - name: Setup Go
