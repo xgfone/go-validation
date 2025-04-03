@@ -1,4 +1,4 @@
-// Copyright 2023 xgfone
+// Copyright 2023~2025 xgfone
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import (
 	"net"
 	"net/url"
 
-	"github.com/xgfone/go-validation/internal"
 	"github.com/xgfone/go-validation/validator"
 )
 
@@ -53,9 +52,14 @@ var (
 // The validator rule is "mac".
 func Mac() validator.Validator {
 	return validator.NewValidator("mac", func(i interface{}) error {
-		switch v := internal.Indirect(i).(type) {
+		switch v := i.(type) {
 		case string:
 			if normalizeMac(v) == "" {
+				return errInvalidMac
+			}
+
+		case *string:
+			if v == nil || normalizeMac(*v) == "" {
 				return errInvalidMac
 			}
 
@@ -79,9 +83,14 @@ func Mac() validator.Validator {
 // The validator rule is "ip".
 func IP() validator.Validator {
 	return validator.NewValidator("ip", func(i interface{}) error {
-		switch v := internal.Indirect(i).(type) {
+		switch v := i.(type) {
 		case string:
 			if net.ParseIP(v) == nil {
+				return errInvalidStringIP
+			}
+
+		case *string:
+			if v == nil || net.ParseIP(*v) == nil {
 				return errInvalidStringIP
 			}
 
@@ -118,6 +127,13 @@ func Cidr() validator.Validator {
 				return errInvalidStringCidr
 			}
 
+		case *string:
+			if v == nil {
+				return errInvalidStringCidr
+			} else if _, _, err := net.ParseCIDR(*v); err != nil {
+				return errInvalidStringCidr
+			}
+
 		case *net.IPNet:
 			if v == nil {
 				return errInvalidCidr
@@ -143,9 +159,17 @@ func Cidr() validator.Validator {
 // The validator rule is "addr".
 func Addr() validator.Validator {
 	return validator.NewValidator("addr", func(i interface{}) error {
-		switch v := internal.Indirect(i).(type) {
+		switch v := i.(type) {
 		case string:
 			if host, port, err := net.SplitHostPort(v); err != nil || host == "" || port == "" {
+				return errInvalidStringAddr
+			}
+
+		case *string:
+			if v == nil {
+				return errInvalidStringAddr
+			}
+			if host, port, err := net.SplitHostPort(*v); err != nil || host == "" || port == "" {
 				return errInvalidStringAddr
 			}
 
@@ -171,9 +195,15 @@ func normalizeMac(mac string) string {
 
 func Url() validator.Validator {
 	return validator.NewValidator("url", func(i interface{}) error {
-		switch v := internal.Indirect(i).(type) {
+		switch v := i.(type) {
 		case string:
 			return validateUrl(v)
+
+		case *string:
+			if v == nil {
+				return errInvalidStringUrl
+			}
+			return validateUrl(*v)
 
 		case fmt.Stringer:
 			return validateUrl(v.String())
@@ -185,6 +215,10 @@ func Url() validator.Validator {
 }
 
 func validateUrl(s string) error {
+	if s == "" {
+		return errInvalidStringUrl
+	}
+
 	if u, err := url.Parse(s); err != nil || u.Scheme == "" || u.Host == "" {
 		return errInvalidStringUrl
 	}

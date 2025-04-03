@@ -46,7 +46,9 @@ func Min(i float64) validator.Validator {
 	return validator.NewValidator(rule, func(v interface{}) error {
 		switch t := internal.Indirect(v).(type) {
 		case nil:
-			return errNilPointer
+			if 0 < i {
+				return errNilPointer
+			}
 
 		case int:
 			if float64(t) < i {
@@ -137,7 +139,9 @@ func Max(i float64) validator.Validator {
 	return validator.NewValidator(rule, func(v interface{}) error {
 		switch t := internal.Indirect(v).(type) {
 		case nil:
-			return errNilPointer
+			if 0 > i {
+				return errNilPointer
+			}
 
 		case int:
 			if float64(t) > i {
@@ -232,7 +236,9 @@ func Ranger(smallest, biggest float64) validator.Validator {
 	return validator.NewValidator(rule, func(v interface{}) error {
 		switch t := internal.Indirect(v).(type) {
 		case nil:
-			return errNilPointer
+			if !inRange(0, smallest, biggest) {
+				return errNilPointer
+			}
 
 		case int:
 			if !inRange(float64(t), smallest, biggest) {
@@ -345,7 +351,7 @@ func Exp(base, startExp, endExp int) validator.Validator {
 
 	rule := fmt.Sprintf("exp(%d,%d,%d)", base, startExp, endExp)
 	return validator.NewValidator(rule, func(i interface{}) error {
-		switch v := i.(type) {
+		switch v := internal.Indirect(i).(type) {
 		case int:
 			if !inRangeInt64(int64(v), values) {
 				return errInteger

@@ -16,6 +16,7 @@ package validators
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"unicode/utf8"
 
@@ -50,9 +51,29 @@ var (
 // a number, such as an integer or float.
 func IsNumber() validator.Validator {
 	return validator.NewValidator("isnumber", func(value interface{}) error {
-		if _, err := strconv.ParseFloat(value.(string), 64); err != nil {
-			return errStrNotNumber
+		switch v := value.(type) {
+		case string:
+			if _, err := strconv.ParseFloat(v, 64); err != nil {
+				return errStrNotNumber
+			}
+
+		case *string:
+			if v == nil {
+				return errStrNotNumber
+			}
+			if _, err := strconv.ParseFloat(*v, 64); err != nil {
+				return errStrNotNumber
+			}
+
+		case fmt.Stringer:
+			if _, err := strconv.ParseFloat(v.String(), 64); err != nil {
+				return errStrNotNumber
+			}
+
+		default:
+			return fmt.Errorf("unsupported type %T", value)
 		}
+
 		return nil
 	})
 }
@@ -61,9 +82,29 @@ func IsNumber() validator.Validator {
 // an integer.
 func IsInteger() validator.Validator {
 	return validator.NewValidator("isinteger", func(value interface{}) error {
-		if _, err := strconv.ParseInt(value.(string), 10, 64); err != nil {
-			return errStrNotInteger
+		switch v := value.(type) {
+		case string:
+			if _, err := strconv.ParseInt(v, 10, 64); err != nil {
+				return errStrNotInteger
+			}
+
+		case *string:
+			if v == nil {
+				return errStrNotInteger
+			}
+			if _, err := strconv.ParseInt(*v, 10, 64); err != nil {
+				return errStrNotInteger
+			}
+
+		case fmt.Stringer:
+			if _, err := strconv.ParseInt(v.String(), 10, 64); err != nil {
+				return errStrNotInteger
+			}
+
+		default:
+			return fmt.Errorf("unsupported type %T", value)
 		}
+
 		return nil
 	})
 }

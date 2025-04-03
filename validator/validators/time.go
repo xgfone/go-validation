@@ -27,9 +27,25 @@ import (
 // The validator rule is "time(format)".
 func Time(format string) validator.Validator {
 	rule := fmt.Sprintf(`time("%s")`, format)
-	return validator.NewValidator(rule, func(i interface{}) error {
-		_, err := time.Parse(format, i.(string))
-		return err
+	return validator.NewValidator(rule, func(i interface{}) (err error) {
+		switch v := i.(type) {
+		case string:
+			_, err = time.Parse(format, v)
+
+		case *string:
+			if v == nil {
+				return fmt.Errorf("invalid time for '%s'", format)
+			}
+			_, err = time.Parse(format, *v)
+
+		case fmt.Stringer:
+			_, err = time.Parse(format, v.String())
+
+		default:
+			err = fmt.Errorf("unsupported type %T", i)
+		}
+
+		return
 	})
 }
 
@@ -38,8 +54,24 @@ func Time(format string) validator.Validator {
 //
 // The validator rule is "duration".
 func Duration() validator.Validator {
-	return validator.NewValidator("duration", func(i interface{}) error {
-		_, err := time.ParseDuration(i.(string))
-		return err
+	return validator.NewValidator("duration", func(i interface{}) (err error) {
+		switch v := i.(type) {
+		case string:
+			_, err = time.ParseDuration(v)
+
+		case *string:
+			if v == nil {
+				return fmt.Errorf("invalid duration")
+			}
+			_, err = time.ParseDuration(*v)
+
+		case fmt.Stringer:
+			_, err = time.ParseDuration(v.String())
+
+		default:
+			err = fmt.Errorf("unsupported type %T", i)
+		}
+
+		return
 	})
 }

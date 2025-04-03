@@ -84,6 +84,9 @@ func StringBoolValidateFunc(validate func(string) bool, err error) ValidateFunc 
 		case string:
 			ok = validate(t)
 
+		case *string:
+			ok = t != nil && validate(*t)
+
 		case fmt.Stringer:
 			ok = validate(t.String())
 
