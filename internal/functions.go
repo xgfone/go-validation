@@ -14,9 +14,7 @@
 
 package internal
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // OneOf is used to check whether a value is one of the values.
 type OneOf struct {
