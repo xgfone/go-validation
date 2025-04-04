@@ -16,7 +16,6 @@ package validators
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"unicode/utf8"
 
@@ -42,69 +41,19 @@ func OneOfWithName(name string, values ...string) validator.Validator {
 	return internal.NewOneOf(name, values...)
 }
 
-var (
-	errStrNotNumber  = errors.New("the string is not a number")
-	errStrNotInteger = errors.New("the string is not an integer")
-)
-
-// IsNumber returns a new validator to check whether the string value is
-// a number, such as an integer or float.
+// IsNumber returns a new validator to check whether the string value is a number,
+// such as an integer or float.
 func IsNumber() validator.Validator {
-	return validator.NewValidator("isnumber", func(value interface{}) error {
-		switch v := value.(type) {
-		case string:
-			if _, err := strconv.ParseFloat(v, 64); err != nil {
-				return errStrNotNumber
-			}
-
-		case *string:
-			if v == nil {
-				return errStrNotNumber
-			}
-			if _, err := strconv.ParseFloat(*v, 64); err != nil {
-				return errStrNotNumber
-			}
-
-		case fmt.Stringer:
-			if _, err := strconv.ParseFloat(v.String(), 64); err != nil {
-				return errStrNotNumber
-			}
-
-		default:
-			return fmt.Errorf("unsupported type %T", value)
-		}
-
-		return nil
-	})
+	return validator.NewBoolValidator("isnumber", func(value string) bool {
+		_, err := strconv.ParseFloat(value, 64)
+		return err == nil
+	}, errors.New("the string is not a number"))
 }
 
-// IsInteger returns a new validator to check whether the string value is
-// an integer.
+// IsInteger returns a new validator to check whether the string value is an integer.
 func IsInteger() validator.Validator {
-	return validator.NewValidator("isinteger", func(value interface{}) error {
-		switch v := value.(type) {
-		case string:
-			if _, err := strconv.ParseInt(v, 10, 64); err != nil {
-				return errStrNotInteger
-			}
-
-		case *string:
-			if v == nil {
-				return errStrNotInteger
-			}
-			if _, err := strconv.ParseInt(*v, 10, 64); err != nil {
-				return errStrNotInteger
-			}
-
-		case fmt.Stringer:
-			if _, err := strconv.ParseInt(v.String(), 10, 64); err != nil {
-				return errStrNotInteger
-			}
-
-		default:
-			return fmt.Errorf("unsupported type %T", value)
-		}
-
-		return nil
-	})
+	return validator.NewBoolValidator("isinteger", func(value string) bool {
+		_, err := strconv.ParseInt(value, 10, 64)
+		return err == nil
+	}, errors.New("the string is not an integer"))
 }

@@ -1,4 +1,4 @@
-// Copyright 2023 xgfone
+// Copyright 2023~2025 xgfone
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,23 +31,53 @@ var (
 //
 // The validator rule is "zero".
 func Zero() validator.Validator {
-	return validator.NewValidator("zero", func(i interface{}) error {
-		if reflect.ValueOf(i).IsZero() {
-			return nil
-		}
-		return errShouldEmpty
-	})
+	return zeroValidator("zero", true, errShouldEmpty)
 }
 
-// Required returns a new Validator to chech whether a value is ZERO,
+// Empty is equal to Zero, which is the alias of Zero.
+//
+// The validator rule is "empty".
+func Empty() validator.Validator {
+	return zeroValidator("empty", true, errShouldEmpty)
+}
+
+// NotZero returns a new Validator to chech whether a value is not ZERO,
 // which returns an error if the value is ZERO.
+//
+// The validator name is "notzero".
+func NotZero() validator.Validator {
+	return zeroValidator("notzero", false, errCannotEmpty)
+}
+
+// NotEmpty is equal to NotZero, which is the alias of NotZero.
+//
+// The validator name is "notempty".
+func NotEmpty() validator.Validator {
+	return zeroValidator("notempty", false, errCannotEmpty)
+}
+
+// Required is equal to NotZero, which is the alias of NotZero.
 //
 // The validator name is "required".
 func Required() validator.Validator {
-	return validator.NewValidator("required", func(i interface{}) error {
-		if reflect.ValueOf(i).IsZero() {
-			return errCannotEmpty
+	return zeroValidator("required", false, errCannotEmpty)
+}
+
+func zeroValidator(name string, zero bool, err error) validator.Validator {
+	return validator.NewValidator(name, func(i any) error {
+		if iszero(i) == zero {
+			return nil
 		}
-		return nil
+		return err
 	})
+}
+
+func iszero(v any) bool {
+	if i, ok := v.(interface{ IsZero() bool }); ok && i.IsZero() {
+		return true
+	}
+	if reflect.ValueOf(v).IsZero() {
+		return true
+	}
+	return false
 }

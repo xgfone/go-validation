@@ -1,4 +1,4 @@
-// Copyright 2023 xgfone
+// Copyright 2023~2025 xgfone
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import (
 )
 
 func TestMapK(t *testing.T) {
-	minint1 := func(i interface{}) bool { return i.(int) >= 1 }
-	maxint9 := func(i interface{}) bool { return i.(int) <= 9 }
+	minint1 := func(i any) bool { return i.(int) >= 1 }
+	maxint9 := func(i any) bool { return i.(int) <= 9 }
 	mapk := MapK(
 		validator.NewValidator("min", validator.BoolValidateFunc(minint1, errors.New("test"))),
 		validator.NewValidator("max", validator.BoolValidateFunc(maxint9, errors.New("test"))),
@@ -35,8 +35,8 @@ func TestMapK(t *testing.T) {
 }
 
 func TestMapV(t *testing.T) {
-	minint1 := func(i interface{}) bool { return i.(int) >= 1 }
-	maxint9 := func(i interface{}) bool { return i.(int) <= 9 }
+	minint1 := func(i any) bool { return i.(int) >= 1 }
+	maxint9 := func(i any) bool { return i.(int) <= 9 }
 	mapk := MapV(
 		validator.NewValidator("min", validator.BoolValidateFunc(minint1, errors.New("test"))),
 		validator.NewValidator("max", validator.BoolValidateFunc(maxint9, errors.New("test"))),
@@ -48,9 +48,9 @@ func TestMapV(t *testing.T) {
 }
 
 func TestMapKV(t *testing.T) {
-	kminint1 := func(i interface{}) bool { return i.(KV).Key.(int) >= 1 }
-	kmaxint9 := func(i interface{}) bool { return i.(KV).Key.(int) <= 9 }
-	vnotzero := func(i interface{}) bool { return i.(KV).Value.(string) != "" }
+	kminint1 := func(i any) bool { return i.(KV).Key.(int) >= 1 }
+	kmaxint9 := func(i any) bool { return i.(KV).Key.(int) <= 9 }
+	vnotzero := func(i any) bool { return i.(KV).Value.(string) != "" }
 	mapk := MapKV(
 		validator.NewValidator("kmin", validator.BoolValidateFunc(kminint1, errors.New("test"))),
 		validator.NewValidator("kmax", validator.BoolValidateFunc(kmaxint9, errors.New("test"))),

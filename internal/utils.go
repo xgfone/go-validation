@@ -20,7 +20,7 @@ import (
 	"reflect"
 )
 
-func encodeJSON(value interface{}) (s string, err error) {
+func encodeJSON(value any) (s string, err error) {
 	buf := bytes.NewBuffer(make([]byte, 0, 32))
 	enc := json.NewEncoder(buf)
 	enc.SetEscapeHTML(false)
@@ -33,7 +33,7 @@ func encodeJSON(value interface{}) (s string, err error) {
 	return
 }
 
-func indirect(value interface{}) interface{} {
+func indirect(value any) any {
 	if value == nil {
 		return nil
 	}
@@ -51,4 +51,4 @@ func indirect(value interface{}) interface{} {
 }
 
 // Indirect is exported.
-func Indirect(value interface{}) interface{} { return indirect(value) }
+func Indirect(value any) any { return indirect(value) }

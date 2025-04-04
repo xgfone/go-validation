@@ -22,8 +22,8 @@ import (
 func TestOr(t *testing.T) {
 	err := errors.New("test")
 	validator := Or(
-		NewValidator("bool", BoolValidateFunc(func(i interface{}) bool { return true }, err)),
-		NewValidator("str", StringBoolValidateFunc(func(s string) bool { return true }, err)),
+		NewValidator("bool", BoolValidateFunc(func(i any) bool { return true }, err)),
+		NewValidator("str", BoolValidateFunc(func(s string) bool { return true }, err)),
 	)
 
 	const expect = "(bool || str)"
@@ -39,8 +39,8 @@ func TestOr(t *testing.T) {
 func TestAnd(t *testing.T) {
 	err := errors.New("test")
 	validator := And(
-		NewValidator("bool", BoolValidateFunc(func(i interface{}) bool { return true }, err)),
-		NewValidator("str", StringBoolValidateFunc(func(s string) bool { return true }, err)),
+		NewValidator("bool", BoolValidateFunc(func(i any) bool { return true }, err)),
+		NewValidator("str", BoolValidateFunc(func(s string) bool { return true }, err)),
 	)
 
 	const expect = "(bool && str)"

@@ -1,4 +1,4 @@
-// Copyright 2023 xgfone
+// Copyright 2023~2025 xgfone
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import (
 )
 
 func TestArray(t *testing.T) {
-	validatefunc := validator.StringBoolValidateFunc(func(s string) bool { return s != "" }, errors.New("test"))
+	validatefunc := validator.BoolValidateFunc(func(s string) bool { return s != "" }, errors.New("test"))
 	array := Array(validator.NewValidator("bool", validatefunc))
 	expectResultNil(t, "array1", array.Validate([]string{}))
 	expectResultNil(t, "array2", array.Validate([]string{"a", "b"}))

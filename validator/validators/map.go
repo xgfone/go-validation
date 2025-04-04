@@ -1,4 +1,4 @@
-// Copyright 2023 xgfone
+// Copyright 2023~2025 xgfone
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ func MapK(validators ...validator.Validator) validator.Validator {
 	}
 
 	_validator, desc := composeValidators("mapk", validators...)
-	return validator.NewValidator(desc, func(i interface{}) error {
+	return validator.NewValidator(desc, func(i any) error {
 		switch vs := i.(type) {
 		case map[string]string:
 			for key := range vs {
@@ -51,7 +51,7 @@ func MapK(validators ...validator.Validator) validator.Validator {
 				}
 			}
 
-		case map[string]interface{}:
+		case map[string]any:
 			for key := range vs {
 				if err := _validator.Validate(key); err != nil {
 					return fmt.Errorf("map key '%s' is invalid: %v", key, err)
@@ -85,7 +85,7 @@ func MapV(validators ...validator.Validator) validator.Validator {
 	}
 
 	_validator, desc := composeValidators("mapv", validators...)
-	return validator.NewValidator(desc, func(i interface{}) error {
+	return validator.NewValidator(desc, func(i any) error {
 		switch vs := i.(type) {
 		case map[string]string:
 			for _, value := range vs {
@@ -94,7 +94,7 @@ func MapV(validators ...validator.Validator) validator.Validator {
 				}
 			}
 
-		case map[string]interface{}:
+		case map[string]any:
 			for _, value := range vs {
 				if err := _validator.Validate(value); err != nil {
 					return fmt.Errorf("map value '%v' is invalid: %v", value, err)
@@ -121,8 +121,8 @@ func MapV(validators ...validator.Validator) validator.Validator {
 
 // KV represents a key-value pair.
 type KV struct {
-	Key   interface{}
-	Value interface{}
+	Key   any
+	Value any
 }
 
 // MapKV returns a new Validator to use the given validators to check
@@ -137,7 +137,7 @@ func MapKV(validators ...validator.Validator) validator.Validator {
 	}
 
 	_validator, desc := composeValidators("mapkv", validators...)
-	return validator.NewValidator(desc, func(i interface{}) error {
+	return validator.NewValidator(desc, func(i any) error {
 		switch vs := i.(type) {
 		case map[string]string:
 			for key, value := range vs {
@@ -146,7 +146,7 @@ func MapKV(validators ...validator.Validator) validator.Validator {
 				}
 			}
 
-		case map[string]interface{}:
+		case map[string]any:
 			for key, value := range vs {
 				if err := _validator.Validate(KV{Key: key, Value: value}); err != nil {
 					return fmt.Errorf("map from key '%v' is invalid: %v", key, err)

@@ -43,7 +43,7 @@ func RegisterValidatorOneof(name string, values ...string) {
 }
 
 // Validate is equal to DefaultBuilder.Validate(v, rule).
-func Validate(v interface{}, rule string) error {
+func Validate(v any, rule string) error {
 	return DefaultBuilder.Validate(v, rule)
 }
 
@@ -51,7 +51,7 @@ func Validate(v interface{}, rule string) error {
 type Builder struct {
 	// Symbols is used to define the global symbols,
 	// which is used by the default of GetIdentifier.
-	Symbols map[string]interface{}
+	Symbols map[string]any
 
 	*predicate.Builder
 	validators atomic.Value
@@ -63,7 +63,7 @@ type Builder struct {
 func NewBuilder() *Builder {
 	builder := &Builder{
 		vcacheMap: make(map[string]validator.Validator),
-		Symbols:   make(map[string]interface{}),
+		Symbols:   make(map[string]any),
 	}
 
 	builder.Builder = predicate.NewBuilder()
@@ -74,7 +74,7 @@ func NewBuilder() *Builder {
 	return builder
 }
 
-func (b *Builder) getIdentifier(selector []string) (interface{}, error) {
+func (b *Builder) getIdentifier(selector []string) (any, error) {
 	// Support the format "zero" instead of "zero()"
 
 	// First, lookup the function table.
@@ -91,7 +91,7 @@ func (b *Builder) getIdentifier(selector []string) (interface{}, error) {
 	return nil, fmt.Errorf("%s is not defined", selector[0])
 }
 
-func (b *Builder) eq(ctx predicate.BuilderContext, left, right interface{}) error {
+func (b *Builder) eq(ctx predicate.BuilderContext, left, right any) error {
 	// Support the format "min == 123" or "123 == min"
 	if f, ok := left.(predicate.BuilderFunction); ok {
 		return f(ctx, right)
@@ -103,7 +103,7 @@ func (b *Builder) eq(ctx predicate.BuilderContext, left, right interface{}) erro
 }
 
 // RegisterSymbol registers the symbol with the name and value.
-func (b *Builder) RegisterSymbol(name string, value interface{}) {
+func (b *Builder) RegisterSymbol(name string, value any) {
 	if name == "" {
 		panic("the symbol name must not be empty")
 	}
@@ -135,24 +135,6 @@ func (b *Builder) RegisterFunction(function Function) {
 //	b.RegisterFunction(ValidatorFunction(name, validator.NewValidator(name, f)))
 func (b *Builder) RegisterValidatorFunc(name string, f validator.ValidateFunc) {
 	b.RegisterFunction(ValidatorFunction(name, validator.NewValidator(name, f)))
-}
-
-// RegisterValidatorFuncBool is a convenient method to treat the bool
-// validation function with the name as a builder function to be registered,
-// which is equal to
-//
-//	b.RegisterValidatorFunc(name, validator.BoolValidateFunc(f, err))
-func (b *Builder) RegisterValidatorFuncBool(name string, f func(interface{}) bool, err error) {
-	b.RegisterValidatorFunc(name, validator.BoolValidateFunc(f, err))
-}
-
-// RegisterValidatorFuncBoolString is a convenient method to treat the string
-// bool validation function with the name as a builder function to be registered,
-// which is equal to
-//
-//	b.RegisterValidatorFunc(name, validator.StringBoolValidateFunc(f, err))
-func (b *Builder) RegisterValidatorFuncBoolString(name string, f func(string) bool, err error) {
-	b.RegisterValidatorFunc(name, validator.StringBoolValidateFunc(f, err))
 }
 
 // RegisterValidatorOneof is a convenient method to register a oneof validator
@@ -215,7 +197,7 @@ func (b *Builder) updateValidators() {
 // Validate validates whether the value v is valid by the rule.
 //
 // If failing to build the rule to the validator, panic with the error.
-func (b *Builder) Validate(v interface{}, rule string) (err error) {
+func (b *Builder) Validate(v any, rule string) (err error) {
 	if rule == "" {
 		return nil
 	}

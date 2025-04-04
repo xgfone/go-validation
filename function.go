@@ -23,28 +23,28 @@ import (
 
 // Function is called by the builder to parse and build the validator.
 type Function interface {
-	Call(c *Context, args ...interface{}) error
+	Call(c *Context, args ...any) error
 	Name() string
 }
 
 type functionImpl struct {
-	call func(*Context, ...interface{}) error
+	call func(*Context, ...any) error
 	name string
 }
 
 func (f functionImpl) Name() string { return f.name }
-func (f functionImpl) Call(c *Context, args ...interface{}) error {
+func (f functionImpl) Call(c *Context, args ...any) error {
 	return f.call(c, args...)
 }
 
 func toBuilderFunction(f Function) predicate.BuilderFunction {
-	return func(context predicate.BuilderContext, args ...interface{}) error {
+	return func(context predicate.BuilderContext, args ...any) error {
 		return f.Call(context.(*Context), args...)
 	}
 }
 
 // NewFunction returns a new Function.
-func NewFunction(name string, call func(*Context, ...interface{}) error) Function {
+func NewFunction(name string, call func(*Context, ...any) error) Function {
 	return functionImpl{name: name, call: call}
 }
 
@@ -61,7 +61,7 @@ func ValidatorFunction(name string, v validator.Validator) Function {
 // NewFunctionWithoutArgs returns a new Function which parses and builds
 // the validator without any arguments.
 func NewFunctionWithoutArgs(name string, newf func() validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		if len(args) > 0 {
 			err = fmt.Errorf("%s must not have any arguments", name)
 		} else {
@@ -74,7 +74,7 @@ func NewFunctionWithoutArgs(name string, newf func() validator.Validator) Functi
 // NewFunctionWithOneFloat returns a new Function which parses and builds
 // the validator with only one float64 argument.
 func NewFunctionWithOneFloat(name string, newf func(float64) validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		if len(args) != 1 {
 			return fmt.Errorf("%s must have and only have one argument", name)
 		}
@@ -87,7 +87,7 @@ func NewFunctionWithOneFloat(name string, newf func(float64) validator.Validator
 	})
 }
 
-func getFloat(name string, index int, i interface{}) (f float64, err error) {
+func getFloat(name string, index int, i any) (f float64, err error) {
 	switch v := i.(type) {
 	case int:
 		f = float64(v)
@@ -109,7 +109,7 @@ func getFloat(name string, index int, i interface{}) (f float64, err error) {
 // NewFunctionWithTwoFloats returns a new Function which parses and builds
 // the validator with only two float64 arguments.
 func NewFunctionWithTwoFloats(name string, newf func(float64, float64) validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		if len(args) != 2 {
 			return fmt.Errorf("%s must have and only have two arguments", name)
 		}
@@ -132,7 +132,7 @@ func NewFunctionWithTwoFloats(name string, newf func(float64, float64) validator
 // NewFunctionWithFloats returns a new Function which parses and builds
 // the validator with any float64 arguments.
 func NewFunctionWithFloats(name string, newf func(...float64) validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		vs := make([]float64, len(args))
 		for i, v := range args {
 			if vs[i], err = getFloat(name, i, v); err != nil {
@@ -147,7 +147,7 @@ func NewFunctionWithFloats(name string, newf func(...float64) validator.Validato
 // NewFunctionWithOneString returns a new Function which parses and builds
 // the validator with only one string argument.
 func NewFunctionWithOneString(name string, newf func(string) validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		if len(args) != 1 {
 			return fmt.Errorf("%s must have and only have one argument", name)
 		}
@@ -165,7 +165,7 @@ func NewFunctionWithOneString(name string, newf func(string) validator.Validator
 // NewFunctionWithStrings returns a new Function which parses and builds
 // the validator with any string arguments.
 func NewFunctionWithStrings(name string, newf func(...string) validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		var ok bool
 		vs := make([]string, len(args))
 		for i, v := range args {
@@ -183,7 +183,7 @@ func NewFunctionWithStrings(name string, newf func(...string) validator.Validato
 //
 // Notice: the parsed validators is composed to a new Valiator by And.
 func NewFunctionWithValidators(name string, newf func(...validator.Validator) validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		if len(args) == 0 {
 			return fmt.Errorf("%s validator has no arguments", name)
 		}
@@ -210,7 +210,7 @@ func NewFunctionWithValidators(name string, newf func(...validator.Validator) va
 // NewFunctionWithThreeInts returns a new Function which parses and builds
 // the validator with only three int arguments.
 func NewFunctionWithThreeInts(name string, newf func(int, int, int) validator.Validator) Function {
-	return NewFunction(name, func(c *Context, args ...interface{}) (err error) {
+	return NewFunction(name, func(c *Context, args ...any) (err error) {
 		if len(args) != 3 {
 			return fmt.Errorf("%s must have and only have three arguments", name)
 		}
@@ -235,7 +235,7 @@ func NewFunctionWithThreeInts(name string, newf func(int, int, int) validator.Va
 	})
 }
 
-func getInt(name string, index int, i interface{}) (v int, err error) {
+func getInt(name string, index int, i any) (v int, err error) {
 	v, ok := i.(int)
 	if ok {
 		return

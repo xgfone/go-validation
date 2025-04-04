@@ -17,6 +17,7 @@ package validator
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -29,12 +30,12 @@ type ValueValidator interface {
 
 // Validator is a validator to check whether the given value is valid.
 type Validator interface {
-	Validate(value interface{}) error
+	Validate(value any) error
 	String() string
 }
 
 // ValidateFunc represents a validation function.
-type ValidateFunc func(value interface{}) error
+type ValidateFunc func(value any) (err error)
 
 // NewValidator returns the new Validator based on the validation rule
 // and function.
@@ -47,59 +48,124 @@ type validator struct {
 	f ValidateFunc
 }
 
-func (v validator) Validate(i interface{}) error { return v.f(i) }
-func (v validator) String() string               { return v.s }
+func (v validator) Validate(i any) error { return v.f(i) }
+func (v validator) String() string       { return v.s }
 
-// BoolValidateFunc converts a bool validation function to ValidateFunc,
-// which returns err if validate returns false, or nil if true.
-func BoolValidateFunc(validate func(interface{}) bool, err error) ValidateFunc {
-	if err == nil {
-		panic("BoolValidateFunc: the error must not be nil")
+// ************************************************************************* //
+
+// NewErrorValidator is a convenient function to new a Validator
+// with the rule and error validation function.
+func NewErrorValidator[T any](rule string, validate func(T) error) Validator {
+	return NewValidator(rule, ErrorValidateFunc(validate))
+}
+
+// NewBoolValidator is a convenient function to new a Validator
+// with the rule and bool validation function.
+func NewBoolValidator[T any](rule string, validate func(T) bool, err error) Validator {
+	return NewValidator(rule, BoolValidateFunc(validate, err))
+}
+
+// ************************************************************************* //
+
+func trystring(t, v any) (value any, ok bool) {
+	if _, ok := t.(string); !ok {
+		return nil, false
 	}
+
+	if _v, ok := v.(fmt.Stringer); ok {
+		return _v.String(), true
+	}
+
+	switch _v := reflect.ValueOf(v); _v.Kind() {
+	case reflect.String:
+		return _v.String(), true
+
+	case reflect.Ptr:
+		if _v.Elem().Kind() == reflect.String {
+			return _v.Elem().String(), true
+		}
+	}
+
+	return nil, false
+}
+
+// ErrorValidateFunc converts a T validation function to ValidateFunc,
+// which asserts the type of the validated value is T or *T.
+func ErrorValidateFunc[T any](validate func(T) error) ValidateFunc {
+	if validate == nil {
+		panic("ErrorValidateFunc: the validation function must not be nil")
+	}
+
+	return func(value any) (err error) {
+		switch v := value.(type) {
+		case T:
+			return validate(v)
+
+		case *T:
+			var _v T
+			if v != nil {
+				_v = *v
+			}
+			return validate(_v)
+
+		case interface{ ValidatedValue() T }:
+			return validate(v.ValidatedValue())
+
+		case interface{ Value() T }:
+			return validate(v.Value())
+
+		default:
+			var x T
+			if _v, ok := trystring(x, value); ok {
+				return validate(_v.(T))
+			}
+			return fmt.Errorf("ErrorValidateFunc[%T]: unsupported type %T", x, value)
+		}
+	}
+}
+
+// BoolValidateFunc converts a T bool validation function to ValidateFunc,
+// which asserts the type of the validated value is T or *T.
+func BoolValidateFunc[T any](validate func(T) bool, err error) ValidateFunc {
 	if validate == nil {
 		panic("BoolValidateFunc: the validation function must not be nil")
 	}
 
-	return func(i interface{}) error {
-		if validate(i) {
-			return nil
-		}
-		return err
-	}
-}
-
-// StringBoolValidateFunc converts a bool validation function to ValidateFunc,
-// which returns err if validate returns false, or nil if true.
-func StringBoolValidateFunc(validate func(string) bool, err error) ValidateFunc {
-	if err == nil {
-		panic("StringBoolValidateFunc: the error must not be nil")
-	}
-	if validate == nil {
-		panic("StringBoolValidateFunc: the validation function must not be nil")
-	}
-
-	return func(i interface{}) error {
+	return func(value any) error {
 		var ok bool
-		switch t := i.(type) {
-		case string:
-			ok = validate(t)
+		switch v := value.(type) {
+		case T:
+			ok = validate(v)
 
-		case *string:
-			ok = t != nil && validate(*t)
+		case *T:
+			var _v T
+			if v != nil {
+				_v = *v
+			}
+			ok = validate(_v)
 
-		case fmt.Stringer:
-			ok = validate(t.String())
+		case interface{ ValidatedValue() T }:
+			ok = validate(v.ValidatedValue())
+
+		case interface{ Value() T }:
+			ok = validate(v.Value())
 
 		default:
-			return fmt.Errorf("unsupported type '%T'", i)
+			var x T
+			if _v, ok := trystring(x, value); ok {
+				ok = validate(_v.(T))
+			}
+			return fmt.Errorf("BoolValidateFunc[%T]: unsupported type %T", x, value)
 		}
 
-		if ok {
-			return nil
+		if !ok {
+			return err
 		}
-		return err
+		return nil
 	}
 }
+
+// ************************************************************************* //
 
 func formatValidators(sep string, validators []Validator) string {
 	switch len(validators) {
@@ -130,7 +196,7 @@ func formatValidators(sep string, validators []Validator) string {
 type andValidator []Validator
 
 // Validate implements the interface Validator.
-func (vs andValidator) Validate(v interface{}) (err error) {
+func (vs andValidator) Validate(v any) (err error) {
 	for i, _len := 0, len(vs); i < _len; i++ {
 		if err = vs[i].Validate(v); err != nil {
 			return
@@ -170,7 +236,7 @@ func And(validators ...Validator) Validator {
 type orValidator []Validator
 
 // Validate implements the interface Validator.
-func (vs orValidator) Validate(v interface{}) (err error) {
+func (vs orValidator) Validate(v any) (err error) {
 	for i, _len := 0, len(vs); i < _len; i++ {
 		if err = vs[i].Validate(v); err == nil {
 			return nil

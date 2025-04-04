@@ -45,7 +45,7 @@ func (o OneOf) Name() string { return o.name }
 func (o OneOf) String() string { return o.desc }
 
 // Validate validates the value i is valid.
-func (o OneOf) Validate(i interface{}) error {
+func (o OneOf) Validate(i any) error {
 	switch v := i.(type) {
 	case string:
 		if !containString(o.values, v) {

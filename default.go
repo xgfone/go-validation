@@ -41,6 +41,9 @@ func init() { RegisterDefaultsForBuilder(DefaultBuilder) }
 //	addr() or addr
 //	cidr() or cidr
 //	zero() or zero
+//	empty() or empty
+//	notzero() or notzero
+//	notempty() or notempty
 //	isinteger() or isinteger
 //	isnumber() or isnumber
 //	duration() or duration
@@ -68,6 +71,9 @@ func RegisterDefaultsForBuilder(b *Builder) {
 	registerTimeValidator(b, "datetimeformat", "2006-01-02 15:04:05")
 
 	b.RegisterFunction(NewFunctionWithoutArgs("zero", validators.Zero))
+	b.RegisterFunction(NewFunctionWithoutArgs("empty", validators.Empty))
+	b.RegisterFunction(NewFunctionWithoutArgs("notzero", validators.NotZero))
+	b.RegisterFunction(NewFunctionWithoutArgs("notempty", validators.NotEmpty))
 	b.RegisterFunction(NewFunctionWithoutArgs("required", validators.Required))
 	b.RegisterFunction(NewFunctionWithoutArgs("isnumber", validators.IsNumber))
 	b.RegisterFunction(NewFunctionWithoutArgs("isinteger", validators.IsInteger))
@@ -230,5 +236,6 @@ func RegisterStringValidatorsForBuilder(b *Builder) {
 }
 
 func registerStrValidator(b *Builder, f func(string) bool, name string) {
-	b.RegisterValidatorFuncBoolString("is"+name, f, fmt.Errorf("the string is not %s", name))
+	err := fmt.Errorf("the string is not %s", name)
+	b.RegisterValidatorFunc("is"+name, validator.BoolValidateFunc(f, err))
 }

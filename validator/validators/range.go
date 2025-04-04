@@ -43,7 +43,7 @@ func Min(i float64) validator.Validator {
 	errInteger := fmt.Errorf("the integer is less than %s", s)
 	errString := fmt.Errorf("the string length is less than %s", s)
 	errContainer := fmt.Errorf("the length is less than %s", s)
-	return validator.NewValidator(rule, func(v interface{}) error {
+	return validator.NewValidator(rule, func(v any) error {
 		switch t := internal.Indirect(v).(type) {
 		case nil:
 			if 0 < i {
@@ -136,7 +136,7 @@ func Max(i float64) validator.Validator {
 	errInteger := fmt.Errorf("the integer is greater than %s", s)
 	errString := fmt.Errorf("the string length is greater than %s", s)
 	errContainer := fmt.Errorf("the length is greater than %s", s)
-	return validator.NewValidator(rule, func(v interface{}) error {
+	return validator.NewValidator(rule, func(v any) error {
 		switch t := internal.Indirect(v).(type) {
 		case nil:
 			if 0 > i {
@@ -233,7 +233,7 @@ func Ranger(smallest, biggest float64) validator.Validator {
 	errInteger := fmt.Errorf("the integer is not in range [%s, %s]", left, right)
 	errString := fmt.Errorf("the string length is not in range [%s, %s]", left, right)
 	errContainer := fmt.Errorf("the length is not in range [%s, %s]", left, right)
-	return validator.NewValidator(rule, func(v interface{}) error {
+	return validator.NewValidator(rule, func(v any) error {
 		switch t := internal.Indirect(v).(type) {
 		case nil:
 			if !inRange(0, smallest, biggest) {
@@ -350,7 +350,7 @@ func Exp(base, startExp, endExp int) validator.Validator {
 	errInteger := fmt.Errorf("the integer is not in range [%s]", buf.String())
 
 	rule := fmt.Sprintf("exp(%d,%d,%d)", base, startExp, endExp)
-	return validator.NewValidator(rule, func(i interface{}) error {
+	return validator.NewValidator(rule, func(i any) error {
 		switch v := internal.Indirect(i).(type) {
 		case int:
 			if !inRangeInt64(int64(v), values) {

@@ -1,15 +1,19 @@
-# Go Validation [![Build Status](https://github.com/xgfone/go-validation/actions/workflows/go.yml/badge.svg)](https://github.com/xgfone/go-validation/actions/workflows/go.yml) [![GoDoc](https://pkg.go.dev/badge/github.com/xgfone/go-validation)](https://pkg.go.dev/github.com/xgfone/go-validation) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://raw.githubusercontent.com/xgfone/go-validation/master/LICENSE)
+# A Go Validation Framework Based On The Built Rule
 
-Provide a validation framework based on the built rule, supporting `Go1.16+`.
-
+[![Build Status](https://github.com/xgfone/go-validation/actions/workflows/go.yml/badge.svg)](https://github.com/xgfone/go-validation/actions/workflows/go.yml)
+[![GoDoc](https://pkg.go.dev/badge/github.com/xgfone/go-validation)](https://pkg.go.dev/github.com/xgfone/go-validation)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://raw.githubusercontent.com/xgfone/go-validation/master/LICENSE)
+![Minimum Go Version](https://img.shields.io/github/go-mod/go-version/xgfone/go-validation?label=Go%2B)
+![Latest SemVer](https://img.shields.io/github/v/tag/xgfone/go-validation?sort=semver)
 
 ## Install
+
 ```shell
 $ go get -u github.com/xgfone/go-validation
 ```
 
-
 ## Example
+
 For registering the validator and validating whether a value is valid, See [Builder](https://pkg.go.dev/github.com/xgfone/go-validation/#example-Builder).
 
 ```go
@@ -80,10 +84,10 @@ func main() {
 
 // For the validation rule, it support the multi-level AND/OR. For example,
 // - "min(100) && max(200)"
-//    => A value, such as integer or length of string/slice, in [100, 200] is valid.
+//   => A value, such as integer or length of string/slice, in [100, 200] is valid.
 // - "min(200) || max(100)"
-//    => A value, such as integer or length of string/slice, in (-∞, 100] or [200, +∞) is valid.
+//   => A value, such as integer or length of string/slice, in (-∞, 100] or [200, +∞) is valid.
 // - "(min(200) || max(100)) && required)"
-//    => Same as "min(200) || max(100)", but also cannot be ZERO.
+//   => Same as "min(200) || max(100)", but also cannot be ZERO.
 }
 ```

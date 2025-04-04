@@ -81,7 +81,7 @@ func ExampleValidatorFunction() {
 	// New a validator "oneof".
 	ss := []string{"one", "two", "three"}
 	desc := fmt.Sprintf(`oneof("%s")`, strings.Join(ss, `", "`))
-	oneof := validator.NewValidator(desc, func(i interface{}) error {
+	oneof := validator.NewValidator(desc, func(i any) error {
 		if s, ok := i.(string); ok {
 			for _, _s := range ss {
 				if _s == s {
@@ -144,8 +144,9 @@ func ExampleBuilder() {
 	// RegisterFunction(NewFunctionWithValidators("mapkv", validator.MapKV))
 
 	////// Register the validator building function based on the bool validation.
-	// isZero := func(i interface{}) bool { return reflect.ValueOf(i).IsZero() }
-	// RegisterValidatorFuncBool("zero", isZero, fmt.Errorf("the value is expected to be zero"))
+	// isZero := func(i any) bool { return reflect.ValueOf(i).IsZero() }
+	// izZeroV := validator.BoolValidateFunc(isZero, fmt.Errorf("the value is expected to be zero"))
+	// RegisterValidatorFunc("zero", izZeroV)
 	// RegisterValidatorFunc("structure", ValidateStruct)
 
 	// Add the global symbols.
