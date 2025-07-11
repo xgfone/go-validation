@@ -108,9 +108,9 @@ func registerTimeValidator(b *Builder, name, layout string) {
 // RegisterStringValidatorsForBuilder registers some string validators,
 // that's, the value is a specific string.
 //
-//	isascii
-//	isalpha
-//	isalphanumeric
+//	isascii: [\x00-\x7F]+
+//	isalpha: [a-zA-Z]+
+//	isalphanumeric: [a-zA-Z0-9]+
 //	isbase64
 //	iscrc32
 //	iscrc64
@@ -120,7 +120,7 @@ func registerTimeValidator(b *Builder, name, layout string) {
 //	isemail
 //	isexistingemail
 //	isfloat
-//	ishexadecimal
+//	ishexadecimal: [0-9a-fA-F]+
 //	ishexcolor
 //	ishost
 //	isimei
