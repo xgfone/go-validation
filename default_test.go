@@ -14,7 +14,10 @@
 
 package validation
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestUrlValidation(t *testing.T) {
 	url := "http://localhost"
@@ -60,5 +63,26 @@ func TestUrlValidation(t *testing.T) {
 	urls = []string{"/path1", "/path2"}
 	if err := DefaultBuilder.Validate(urls, "ranger(1,9) && array(url)"); err == nil {
 		t.Error("expect an error, but got nil")
+	}
+}
+
+type _Validator string
+
+func (v _Validator) Validate() error {
+	if v == "" {
+		return errors.New("must not be empty")
+	}
+	return nil
+}
+
+func TestSelfValidator(t *testing.T) {
+	v1 := _Validator("")
+	if err := Validate(v1, "self"); err == nil {
+		t.Errorf("expect an error, but nil")
+	}
+
+	v2 := _Validator("abc")
+	if err := Validate(v2, "self"); err != nil {
+		t.Errorf("expect nil, but got an error: %v", err)
 	}
 }

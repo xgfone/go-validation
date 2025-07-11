@@ -62,6 +62,7 @@ func init() { RegisterDefaultsForBuilder(DefaultBuilder) }
 //	timeformat() or timeformat => time(timelayout)
 //	dateformat() or dateformat => time(datelayout)
 //	datetimeformat() or datetimeformat => time(datetimelayout)
+//	self() or self: the validated value must have implemented validator.ValueValidator.
 func RegisterDefaultsForBuilder(b *Builder) {
 	b.RegisterSymbol("timelayout", "15:04:05")
 	b.RegisterSymbol("datelayout", "2006-01-02")
@@ -97,6 +98,10 @@ func RegisterDefaultsForBuilder(b *Builder) {
 	b.RegisterFunction(NewFunctionWithValidators("mapk", validators.MapK))
 	b.RegisterFunction(NewFunctionWithValidators("mapv", validators.MapV))
 	b.RegisterFunction(NewFunctionWithValidators("mapkv", validators.MapKV))
+
+	b.RegisterValidatorFunc("self", func(value any) (err error) {
+		return value.(validator.ValueValidator).Validate()
+	})
 }
 
 func registerTimeValidator(b *Builder, name, layout string) {
