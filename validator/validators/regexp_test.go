@@ -17,10 +17,10 @@ package validators
 import "testing"
 
 func TestRegexp(t *testing.T) {
-	v := Regexp("[a-zA-Z0-9._]+")
+	v := Regexp("[a-zA-Z0-9._]{1,16}")
 
-	if s := v.String(); s != `regexp("^[a-zA-Z0-9._]+$")` {
-		t.Errorf("expect rule '%s', but got '%s'", `regexp("^[a-zA-Z0-9._]+$")`, s)
+	if s := v.String(); s != `regexp("^[a-zA-Z0-9._]{1,16}$")` {
+		t.Errorf("expect rule '%s', but got '%s'", `regexp("^[a-zA-Z0-9._]{1,16}$")`, s)
 	}
 
 	if err := v.Validate("abc"); err != nil {
@@ -33,6 +33,9 @@ func TestRegexp(t *testing.T) {
 		t.Errorf("expect nil, but got an error: %v", err)
 	}
 	if err := v.Validate("abc-123"); err == nil {
+		t.Errorf("expect an error, but got nil")
+	}
+	if err := v.Validate("abc01234567890xyz"); err == nil {
 		t.Errorf("expect an error, but got nil")
 	}
 }
