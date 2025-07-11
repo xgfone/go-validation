@@ -20,8 +20,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/xgfone/go-validation/internal"
 	"github.com/xgfone/go-validation/validator"
+	"github.com/xgfone/go-validation/validator/validators"
 	"github.com/xgfone/predicate"
 )
 
@@ -30,14 +30,17 @@ import (
 // See RegisterDefaults.
 var DefaultBuilder = NewBuilder()
 
-// RegisterValidatorFunc is equal to
-// DefaultBuilder.RegisterValidatorFunc(name, f).
+// RegisterValidator is equal to DefaultBuilder.RegisterValidator(name, v).
+func RegisterValidator(name string, v validator.Validator) {
+	DefaultBuilder.RegisterValidator(name, v)
+}
+
+// RegisterValidatorFunc is equal to DefaultBuilder.RegisterValidatorFunc(name, f).
 func RegisterValidatorFunc(name string, f validator.ValidateFunc) {
 	DefaultBuilder.RegisterValidatorFunc(name, f)
 }
 
-// RegisterValidatorOneof is equal to
-// DefaultBuilder.RegisterValidatorOneof(name,values...).
+// RegisterValidatorOneof is equal to DefaultBuilder.RegisterValidatorOneof(name, values...).
 func RegisterValidatorOneof(name string, values ...string) {
 	DefaultBuilder.RegisterValidatorOneof(name, values...)
 }
@@ -128,21 +131,27 @@ func (b *Builder) RegisterFunction(function Function) {
 	b.Builder.RegisterFunc(function.Name(), toBuilderFunction(function))
 }
 
-// RegisterValidatorFunc is a convenient method to treat the validation
-// function with the name as a builder function to be registered, which
-// is equal to
+// RegisterValidator is the convenient method to convert the validator
+// to the builder function, which is equal to
 //
-//	b.RegisterFunction(ValidatorFunction(name, validator.NewValidator(name, f)))
+//	b.RegisterFunction(ValidatorFunction(name, validator))
+func (b *Builder) RegisterValidator(name string, validator validator.Validator) {
+	b.RegisterFunction(ValidatorFunction(name, validator))
+}
+
+// RegisterValidatorFunc is a convenient method, which is equal to
+//
+//	b.RegisterValidator(name, validator.NewValidator(name, f))
 func (b *Builder) RegisterValidatorFunc(name string, f validator.ValidateFunc) {
-	b.RegisterFunction(ValidatorFunction(name, validator.NewValidator(name, f)))
+	b.RegisterValidator(name, validator.NewValidator(name, f))
 }
 
 // RegisterValidatorOneof is a convenient method to register a oneof validator
 // as the builder Function, which is equal to
 //
-//	b.RegisterFunction(ValidatorFunction(name, validators.OneOfWithName(name, values...)))
+//	b.RegisterValidator(name, validators.OneOfWithName(name, values...))
 func (b *Builder) RegisterValidatorOneof(name string, values ...string) {
-	b.RegisterFunction(ValidatorFunction(name, internal.NewOneOf(name, values...)))
+	b.RegisterValidator(name, validators.OneOfWithName(name, values...))
 }
 
 // Build parses and builds the validation rule into the context.
