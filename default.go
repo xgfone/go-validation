@@ -62,6 +62,8 @@ func init() { RegisterDefaultsForBuilder(DefaultBuilder) }
 //	timeformat() or timeformat => time(timelayout)
 //	dateformat() or dateformat => time(datelayout)
 //	datetimeformat() or datetimeformat => time(datetimelayout)
+//	posixregexp(rule string)
+//	regexp(rule string)
 //	self() or self: the validated value must have implemented validator.ValueValidator.
 func RegisterDefaultsForBuilder(b *Builder) {
 	b.RegisterSymbol("timelayout", "15:04:05")
@@ -92,6 +94,9 @@ func RegisterDefaultsForBuilder(b *Builder) {
 
 	b.RegisterFunction(NewFunctionWithOneString("time", validators.Time))
 	b.RegisterFunction(NewFunctionWithoutArgs("duration", validators.Duration))
+
+	b.RegisterFunction(NewFunctionWithOneString("regexp", validators.Regexp))
+	b.RegisterFunction(NewFunctionWithOneString("posixregexp", validators.RegexpPOSIX))
 
 	b.RegisterFunction(NewFunctionWithStrings("oneof", validators.OneOf))
 	b.RegisterFunction(NewFunctionWithValidators("array", validators.Array))
