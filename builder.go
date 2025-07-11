@@ -110,6 +110,11 @@ func (b *Builder) eq(ctx predicate.BuilderContext, left, right any) error {
 	return fmt.Errorf("left or right is not BuilderFunction: %T, %T", left, right)
 }
 
+// Validators returns the names of all the validators.
+func (b *Builder) ValidatorNames() []string {
+	return b.Builder.GetAllFuncNames()
+}
+
 // RegisterSymbol registers the symbol with the name and value.
 func (b *Builder) RegisterSymbol(name string, value any) {
 	if name == "" {

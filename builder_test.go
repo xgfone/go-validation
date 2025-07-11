@@ -16,11 +16,22 @@ package validation
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/xgfone/go-validation/validator"
 )
+
+func TestValidatorNames(t *testing.T) {
+	b := NewBuilder()
+	b.RegisterValidatorOneof("oneof", "a", "b", "c")
+
+	expects := []string{"oneof"}
+	if names := b.ValidatorNames(); !reflect.DeepEqual(expects, names) {
+		t.Errorf("expect validator names %v, but got %v", expects, names)
+	}
+}
 
 func TestRuleRanger(t *testing.T) {
 	expectErrMsg := "the integer is not in range [1, 10]"
