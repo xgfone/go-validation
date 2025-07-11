@@ -30,6 +30,11 @@ import (
 // See RegisterDefaults.
 var DefaultBuilder = NewBuilder()
 
+// RegisterSymbol is equal to DefaultBuilder.RegisterSymbol(name, value).
+func RegisterSymbol(name string, value any) {
+	DefaultBuilder.RegisterSymbol(name, value)
+}
+
 // RegisterValidator is equal to DefaultBuilder.RegisterValidator(name, v).
 func RegisterValidator(name string, v validator.Validator) {
 	DefaultBuilder.RegisterValidator(name, v)
